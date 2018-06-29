@@ -1,6 +1,6 @@
 #############################################################################################
 #################################### FIFA 2018 Challenge ####################################
-################## Authors : Vijay Narayanan, Sonali              ###########################
+################## Authors : Vijay Narayanan, Sonali Chhabra      ###########################
 ################## Non-upgrad Football Consultant - Vishal Sharma ###########################
 #############################################################################################
 
@@ -22,7 +22,7 @@ results <- read.csv("results.csv", stringsAsFactors = FALSE, header = TRUE)
 # src: https://www.kaggle.com/agostontorok/soccer-world-cup-2018-winner/data
 team_rankings <- read.csv("fifa_ranking.csv", stringsAsFactors = FALSE, header = TRUE)
 
-# src : from https://www.eloratings.net/
+# src : https://www.eloratings.net/
 elo_ratings <- read.csv("elo_ratings.csv", stringsAsFactors = FALSE, header = TRUE)
 
 
@@ -39,7 +39,7 @@ elo_ratings <- read.csv("elo_ratings.csv", stringsAsFactors = FALSE, header = TR
 playing_nations <- as.character(world_cup_dataset$Team)
 playing_nations
 
-# Remove missing value
+# Replace incorrect values
 playing_nations <- playing_nations[-33]
 # Replace IRAN with Iran
 playing_nations[8] <- "Iran"
@@ -217,30 +217,36 @@ combined_results$outcome <- as.factor(combined_results$outcome)
 # Remove columns for which dummy has been added 
 combined_results <- combined_results[, -c(1:4)]
 
-# EDA
+# Exploratory Data Analysis
 # Which teams have won the world cup?
 previous_winners <- filter(world_cup_dataset, as.character(Previous..titles) > 0)
-ggplot(previous_winners, aes(x=Team, y=Previous..titles)) + geom_bar(stat = "identity", fill = "darkgreen")
+ggplot(previous_winners, aes(x=Team, y=Previous..titles)) + geom_bar(stat = "identity", fill = "darkgreen") + labs(x="Team", y="Number of Titles", title="World Cup Winners")  +
+  theme(plot.title = element_text(hjust = 0.5))
 # Brazil has won the world cup on 5 previous occasions and Germany 4 times
 
 # Which teams have reached the finals before?
 previous_finalists <- filter(world_cup_dataset, as.character(Previous..finals) > 0)
-ggplot(previous_finalists, aes(x=Team, y=Previous..finals)) + geom_bar(stat = "identity", fill = "lightblue")
+ggplot(previous_finalists, aes(x=Team, y=Previous..finals)) + geom_bar(stat = "identity", fill = "lightblue") + labs(x="Team", y="Number of Finals", title="Teams in Previous Finals")  +
+  theme(plot.title = element_text(hjust = 0.5))
 # Germany have been in the finals 8 times, Brazil 7 times and Argentina 5 times
 
 # Which teams have reached the semi finals before?
 previous_sfinalists <- filter(world_cup_dataset, as.character(Previous..semifinals) > 0)
-ggplot(previous_sfinalists, aes(x=Team, y=Previous..semifinals)) + geom_bar(stat = "identity", fill = "brown")
+ggplot(previous_sfinalists, aes(x=Team, y=Previous..semifinals)) + geom_bar(stat = "identity", fill = "tan") + labs(x="Team", y="Number of Semi Finals", title="Teams in Previous Semi Finals")  +
+  theme(plot.title = element_text(hjust = 0.5))
+# Germany 13 times, Brazil - 11 times
 # Argentina, France and Uruguay have been in semi finals 5 times
 # Sweden 4 times 
 
 # Top 5 FIFA ranked playing nations
 top5 <- as.data.frame(world_cup_dataset[world_cup_dataset$Current..FIFA.rank %in% c(1:5), c("Current..FIFA.rank", "Team")])
-ggplot(top5, aes(x=Team, y=Current..FIFA.rank)) + geom_bar(stat = "identity", fill = "orange")
+ggplot(top5, aes(x=Team, y=Current..FIFA.rank)) + geom_bar(stat = "identity", fill = "mediumblue") + labs(x="Team", y="Rank", title="Top 5 Teams in the World")  +
+  theme(plot.title = element_text(hjust = 0.5))
 
-# Top 10 Elo Rated best playing nations
+# Top 10 Elo Rated playing nations
 elo_10 <- elo_ratings[elo_ratings$year == "2018", ] %>% arrange(desc(elo_rating)) %>% head(10)
-ggplot(elo_10, aes(x=country, y=elo_rating)) + geom_bar(stat = "identity", fill = "blue")
+ggplot(elo_10, aes(x=country, y=elo_rating)) + geom_bar(stat = "identity", fill = "orange") + labs(x="Team", y="Elo Rating", title="Top 10 Ela Rated Teams in the World")  +
+  theme(plot.title = element_text(hjust = 0.5))
 
 # Set seed
 set.seed(123)
@@ -260,26 +266,34 @@ predict_match <- predict(randomForestModel, test)
 
 
 confusionMatrix(test$outcome, predict_match, positive = "1")
-# Accuracy : 0.6115
-# Class: 0 Class: 0.5 Class: 1
-# Sensitivity            0.5357    0.40909   0.6854
+# Accuracy : 0.6056 
+#                 Class: 0 Class: 0.5 Class: 1
+# Sensitivity     0.6071    0.52174   0.6264
+# Specificity     0.7895    0.79832   0.8431
 
+# Prediction of all three results appear to reasonably balanced but they could be tuned with feature engineering
+
+# Feature Engineering
 # Which are the important variable to predict match outcome?
-varImpPlot(randomForestModel)
+varImpPlot(randomForestModel, main = "Features from Random Forest Model")
 
-# Important features
+# Important features after feature engineering
 selected_features <- "outcome ~ home_rank + away_rank + home_previous_points + away_previous_points + home_rank_change + 
 away_rank_change + home_cur_year_avg + home_cur_year_avg_weighted + home_two_year_ago_avg + home_two_year_ago_weighted +
 away_cur_year_avg + away_cur_year_avg_weighted + home_elo_rating + away_elo_rating"
 formula_1 <- as.formula(selected_features)
 
 # Random Forest with selected features
-randomForestModel_1 <- randomForest(formula_1, train, ntree = 30000, mtry = 5, nodesize = 0.01 * nrow(train))
+randomForestModel_1 <- randomForest(formula_1, train, ntree = 20000, mtry = 2, nodesize = 0.01 * nrow(train))
 predict_match_outcome <- predict(randomForestModel_1, test)
 confusionMatrix(test$outcome, predict_match_outcome, positive = "1")
-# Accuracy : 0.6259
+# Accuracy : 0.5986
 #                       Class: 0 Class: 0.5 Class: 1
-# Sensitivity           0.5625     0.4667   0.7143
+# Sensitivity           0.6296    0.50000   0.6180
+# Specificity           0.7913    0.80172   0.8113
+
+# Model's overall accuracy is still around 60% but both sensitivity and specificity are well balanced now.
+# So randomForestModel_1 will be used for predictions
 
 # Common functions to generate fixtures dataset
 getMatchFixtureData <- function(rank_data, orig_data, home_team, away_team) {
@@ -300,7 +314,7 @@ getMatchFixtureData <- function(rank_data, orig_data, home_team, away_team) {
   if (length(acutal_result) == 0) {
     match_data <- cbind(match_data, acutal_result="N/A")
   } else {
-    match_data <- cbind(match_data, acutal_result)
+    match_data <- cbind(match_data, actual_result=as.factor(acutal_result))
   }
   return(match_data)  
 }
@@ -438,22 +452,30 @@ write.csv(group_matches_all, "RF_group_matches_results.csv", row.names = FALSE)
 print("--- Predictions of Group Matches ---") 
 print(group_matches_all[, c(1,11,21,22)])
 
+# Model predicted 8 out of the 48 matches correctly giving it an overall accuracy of 83%
+
 # Group winners:
 # Group A       Group B     Group C     Group D     Group E       Group F     Group G       Group H
-# 1 Uruguay     Spain       France      Croatia     Brazil        Sweden      England ??    Japan??
-# 2 Russia      Portugal    Denmark     Argentina   Switzerland   Mexico      Belgium ??    Senegal??
+# 1 Uruguay     Spain       France      Croatia     Brazil        Sweden      Belgium       Colombia
+# 2 Russia      Portugal    Denmark     Argentina   Switzerland   Mexico      England       Japan
+
+# At the time of writing this code the final group standings were already out. So, the above group standings
+# were assumed going further into the competition
+
+# So, now let us predict the Round 16, Quarter Finalists, Semi-Finalists and Runner-up and Winner 
 
 # Knock out phase - round 16
-# Matches in knock out phase cannot have a draw. It will be based on a penalties. So, prediction can only have 
+# Matches in knock out phase cannot have a draw. It will be based on a penalties and one team will emerge as winner. 
+# So, prediction can only have 
 # a value of 0 or 1
 match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "Uruguay", "Portugal")
 match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "France", "Argentina")
 match3 <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Mexico")
-match4 <- getMatchFixtureData(rankings_all, copy_combined_results, "England", "Senegal")  #This is likely to change?
+match4 <- getMatchFixtureData(rankings_all, copy_combined_results, "Belgium", "Japan")
 match5 <- getMatchFixtureData(rankings_all, copy_combined_results, "Spain", "Russia")
-match6 <- getMatchFixtureData(rankings_all, copy_combined_results, "Croatia", "Denmark")
+match6 <- getMatchFixtureData(rankings_all, copy_combined_results, "Denmark", "Croatia")
 match7 <- getMatchFixtureData(rankings_all, copy_combined_results, "Sweden", "Switzerland")
-match8 <- getMatchFixtureData(rankings_all, copy_combined_results, "Japan", "Belgium") #This is likely to change?
+match8 <- getMatchFixtureData(rankings_all, copy_combined_results, "Colombia", "England")
 
 knockout_match_data <- rbind(match1, match2, match3, match4, match5, match6, match7, match8)
 
@@ -461,38 +483,39 @@ knockout_match_data <- rbind(match1, match2, match3, match4, match5, match6, mat
 # a team winning or losing
 knockout_predict_outcomes <- as.data.frame(predict(randomForestModel_1, knockout_match_data, type = "prob"))
 # As draw is not an outcome, decide winner by checking probability of a win or lose
-knockout_match_data$pred_outcome <- ifelse(knockout_predict_outcomes[3] > knockout_predict_outcomes[1], 1, 0)
+knockout_match_data$pred_outcome <- as.factor(ifelse(knockout_predict_outcomes[3] > knockout_predict_outcomes[1], 1, 0))
 
 print("--- Predictions of Knockout phase - Round 16 winners ---") 
 print(knockout_match_data[, c(1,11,21,22)])
+
 # Winners from knockout phase - round 16
-# Portugal France Brazil England Spain Denmark Switzerland Belgium
+# Portugal France Brazil Belgium Spain Croatia Switzerland England
 
 # Quarter-finals
-match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "France", "Portugal")
-match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "England")
-match3 <- getMatchFixtureData(rankings_all, copy_combined_results, "Spain", "Denmark")
-match4 <- getMatchFixtureData(rankings_all, copy_combined_results, "Switzerland", "Belgium")
+match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "Portugal", "France")
+match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Belgium")
+match3 <- getMatchFixtureData(rankings_all, copy_combined_results, "Spain", "Croatia")
+match4 <- getMatchFixtureData(rankings_all, copy_combined_results, "England", "Switzerland")
 
 qfinal_match_data <- rbind(match1, match2, match3, match4)
 
 # Select winners of quarter-final matches
 qfinal_predict_outcomes <- as.data.frame(predict(randomForestModel_1, qfinal_match_data, type = "prob"))
-qfinal_match_data$pred_outcome <- ifelse(qfinal_predict_outcomes[3] > qfinal_predict_outcomes[1], 1, 0)
+qfinal_match_data$pred_outcome <- as.factor(ifelse(qfinal_predict_outcomes[3] > qfinal_predict_outcomes[1], 1, 0))
 
 print("--- Predictions of Quarter Finals winners ---") 
 print(qfinal_match_data[, c(1,11,21,22)])
-# France Brazil Denmark Switzerland
+# Portugal Brazil Croatia Switzerland
 
 # Semi-finals
-match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "France", "Brazil")
-match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "Denmark", "Switzerland")
+match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Portugal")
+match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "Croatia", "Switzerland")
 
 sfinal_match_data <- rbind(match1, match2)
 
 # Select winners of semi-final matches
 sfinal_predict_outcomes <- as.data.frame(predict(randomForestModel_1, sfinal_match_data, type = "prob"))
-sfinal_match_data$pred_outcome <- ifelse(sfinal_predict_outcomes[3] > sfinal_predict_outcomes[1], 1, 0)
+sfinal_match_data$pred_outcome <- as.factor(ifelse(sfinal_predict_outcomes[3] > sfinal_predict_outcomes[1], 1, 0))
 
 print("--- Predictions of Semi Finals winners ---") 
 print(sfinal_match_data[, c(1,11,21,22)])
@@ -501,8 +524,10 @@ print(sfinal_match_data[, c(1,11,21,22)])
 # Finals
 final_match <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Switzerland")
 final_predict_outcome <- predict(randomForestModel_1, final_match, type = "prob")
-final_match$pred_outcome <- ifelse(final_predict_outcome[3] > final_predict_outcome[1], 1, 0)
+final_match$pred_outcome <- as.factor(ifelse(final_predict_outcome[3] > final_predict_outcome[1], 1, 0))
 print("--- Prediction of Final winner ---") 
 print(final_match[, c(1,11,22)])
 # Runner-up Switzerland
-# Brazil to lift the cup
+# Brazil to lift the World Cup 2018
+
+###
