@@ -11,3 +11,4 @@ Please follow the instructions,
 1. Clone this github repo
 2. Check above mentioned 4 Datasets (all .csv files) are present in the same directory as the R code
 3. Run CrystalBallerz-WorlCup2018-Prediction.R file
+4. Open CrystalBallerz-WorldCup2018-Report.pptx file for presentation
