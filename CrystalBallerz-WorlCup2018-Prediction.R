@@ -140,7 +140,7 @@ results <- results %>% filter(match_year >= "1993")
 str(elo_ratings)
 
 # Remove empty columns
-elo_ratings <- elo_ratings[, -c(4,5)]
+#elo_ratings <- elo_ratings[, -c(4,5)]
 
 # Common function
 getLatestRankingForNationsByYear <- function(data) {
@@ -169,26 +169,38 @@ home_combined <- rename(home_combined, home_rank = rank, home_total_points = tot
                         home_rank_change = rank_change, home_cur_year_avg = cur_year_avg, home_cur_year_avg_weighted = cur_year_avg_weighted,
                         home_last_year_avg = last_year_avg, home_last_year_avg_weighted = last_year_avg_weighted, home_two_year_ago_avg = two_year_ago_avg,
                         home_two_year_ago_weighted = two_year_ago_weighted, home_three_year_ago_avg = three_year_ago_avg,
-                        home_three_year_ago_weighted = three_year_ago_weighted, home_elo_rating = elo_rating)
+                        home_three_year_ago_weighted = three_year_ago_weighted, home_elo_rating = elo_rating, 
+                        home_elo_rank_change = elo_rank_change, home_elo_rating_change = elo_rating_change)
+
 remove_away_cols <- c("match_year", "home_team", "home_score", "away_score", "tournament", "city", "country", "neutral", "country_abrv", "confederation", "rank_date")
 away_combined <- away_combined[, -which(colnames(away_combined) %in% remove_away_cols)]
 away_combined <- rename(away_combined, away_rank = rank, away_total_points = total_points, away_previous_points = previous_points,
                         away_rank_change = rank_change, away_cur_year_avg = cur_year_avg, away_cur_year_avg_weighted = cur_year_avg_weighted,
                         away_last_year_avg = last_year_avg, away_last_year_avg_weighted = last_year_avg_weighted, away_two_year_ago_avg = two_year_ago_avg,
                         away_two_year_ago_weighted = two_year_ago_weighted, away_three_year_ago_avg = three_year_ago_avg,
-                        away_three_year_ago_weighted = three_year_ago_weighted, away_elo_rating = elo_rating)
+                        away_three_year_ago_weighted = three_year_ago_weighted, away_elo_rating = elo_rating,
+                        away_elo_rank_change = elo_rank_change, away_elo_rating_change = elo_rating_change)
 
 # Merge home and away datasets
 combined_results <- merge(results, home_combined, by.x = c("home_team", "date"), by.y = c("home_team", "date"), all = TRUE)
 combined_results <- merge(combined_results, away_combined, by.x = c("away_team", "date"), by.y = c("away_team", "date"), all = TRUE)
 
 # Reorder columns
-combined_results <- combined_results[, c(2,3,1,4:36)]
+combined_results <- combined_results[, c(2,3,1,4:40)]
 
 # Populate outcome with 0 (home team loses), 0.5 (draw), 1 (home team wins)
 combined_results$outcome <- ifelse(combined_results$home_score > combined_results$away_score, 1, ifelse(combined_results$home_score < combined_results$away_score, 0, 0.5))
 
-# Omit rows with NA 
+# Summary of dataset
+summary(combined_results)
+# 292 missing values in home_elo_rank_change, home_elo_rating_change
+# Set to 0
+combined_results$home_elo_rank_change[is.na(combined_results$home_elo_rank_change)] <- 0
+combined_results$home_elo_rating_change[is.na(combined_results$home_elo_rating_change)] <- 0
+combined_results$away_elo_rank_change[is.na(combined_results$away_elo_rank_change)] <- 0
+combined_results$away_elo_rating_change[is.na(combined_results$away_elo_rating_change)] <- 0
+
+# Omit rows with only NAs 
 combined_results <- na.omit(combined_results)
 
 # Copy of combined_results dataset
@@ -266,33 +278,36 @@ predict_match <- predict(randomForestModel, test)
 
 
 confusionMatrix(test$outcome, predict_match, positive = "1")
-# Accuracy : 0.6056 
+# Accuracy : 0.6197
 #                 Class: 0 Class: 0.5 Class: 1
-# Sensitivity     0.6071    0.52174   0.6264
-# Specificity     0.7895    0.79832   0.8431
+# Sensitivity     0.6452    0.46667   0.6667
+# Specificity     0.8108    0.80357   0.8197
 
-# Prediction of all three results appear to reasonably balanced but they could be tuned with feature engineering
+# Let us use feature engineering to improve accuracy and balance the sensitivity and specificity values
 
 # Feature Engineering
-# Which are the important variable to predict match outcome?
+# Which are the important variables to predict match outcome?
 varImpPlot(randomForestModel, main = "Features from Random Forest Model")
 
 # Important features after feature engineering
-selected_features <- "outcome ~ home_rank + away_rank + home_previous_points + away_previous_points + home_rank_change + 
-away_rank_change + home_cur_year_avg + home_cur_year_avg_weighted + home_two_year_ago_avg + home_two_year_ago_weighted +
-away_cur_year_avg + away_cur_year_avg_weighted + home_elo_rating + away_elo_rating"
+selected_features <- "outcome ~ home_rank + away_rank + home_elo_rating + away_elo_rating + home_rank_change + 
+away_rank_change + home_elo_rank_change + away_elo_rank_change + home_elo_rating_change + away_elo_rating_change + 
+home_cur_year_avg + away_cur_year_avg + home_cur_year_avg_weighted + away_cur_year_avg_weighted + home_two_year_ago_avg + 
+away_two_year_ago_avg + home_two_year_ago_weighted + away_two_year_ago_weighted + home_three_year_ago_avg + away_three_year_ago_avg + 
+home_three_year_ago_weighted + away_three_year_ago_weighted + home_total_points + away_total_points + home_previous_points + away_previous_points"
+
 formula_1 <- as.formula(selected_features)
 
 # Random Forest with selected features
-randomForestModel_1 <- randomForest(formula_1, train, ntree = 20000, mtry = 2, nodesize = 0.01 * nrow(train))
+randomForestModel_1 <- randomForest(formula_1, train, ntree = 30000, mtry = 2, nodesize = 0.01 * nrow(train))
 predict_match_outcome <- predict(randomForestModel_1, test)
 confusionMatrix(test$outcome, predict_match_outcome, positive = "1")
-# Accuracy : 0.5986
+# Accuracy : 0.6479
 #                       Class: 0 Class: 0.5 Class: 1
-# Sensitivity           0.6296    0.50000   0.6180
-# Specificity           0.7913    0.80172   0.8113
+# Sensitivity           0.7097    0.51852   0.6667
+# Specificity           0.8288    0.80870   0.8448
 
-# Model's overall accuracy is still around 60% but both sensitivity and specificity are well balanced now.
+# Model's overall accuracy has improved both sensitivity and specificity are well balanced now.
 # So randomForestModel_1 will be used for predictions
 
 # Common functions to generate fixtures dataset
@@ -321,11 +336,12 @@ getMatchFixtureData <- function(rank_data, orig_data, home_team, away_team) {
 
 # Test predictions using Random Forest Model
 # Create Test Data for Group Matches
-cols_from_rankings <- c("country_full","rank", "previous_points", "rank_change", "cur_year_avg", "cur_year_avg_weighted",
-                        "two_year_ago_avg", "two_year_ago_weighted", "total_points", "elo_rating")
+cols_from_rankings <- c("country_full","rank", "elo_rating", "rank_change", "elo_rank_change", "elo_rating_change", "cur_year_avg", 
+                        "cur_year_avg_weighted", "two_year_ago_avg", "two_year_ago_weighted", "three_year_ago_avg", 
+                        "three_year_ago_weighted", "total_points", "previous_points")
 rankings_all <- as.data.frame(latest_team_rankings[latest_team_rankings$country_full %in% playing_nations & latest_team_rankings$year == "2018", which(colnames(latest_team_rankings) %in% cols_from_rankings)])
 
-# Group Phase -
+# Predictions for Group Phase Matches
 # Win for a team is denoted by pred_outcome dependent variable having a value of 1
 # Loss for a team is denoted by pred_outcome dependent variable having a value of 0
 # Draw is denoted by pred_outcome dependent variable having a value of 0.5
@@ -450,9 +466,9 @@ group_matches_all <- rbind(groupA_match_data, groupB_match_data, groupC_match_da
 write.csv(group_matches_all, "RF_group_matches_results.csv", row.names = FALSE)
 
 print("--- Predictions of Group Matches ---") 
-print(group_matches_all[, c(1,11,21,22)])
+print(group_matches_all[, c(1,15,29,30)])
 
-# Model predicted 8 out of the 48 matches correctly giving it an overall accuracy of 83%
+# Model predicted 4 out of the 48 matches correctly giving it an overall accuracy of 92%
 
 # Group winners:
 # Group A       Group B     Group C     Group D     Group E       Group F     Group G       Group H
@@ -486,7 +502,7 @@ knockout_predict_outcomes <- as.data.frame(predict(randomForestModel_1, knockout
 knockout_match_data$pred_outcome <- as.factor(ifelse(knockout_predict_outcomes[3] > knockout_predict_outcomes[1], 1, 0))
 
 print("--- Predictions of Knockout phase - Round 16 winners ---") 
-print(knockout_match_data[, c(1,11,21,22)])
+print(knockout_match_data[, c(1,15,29,30)])
 
 # Winners from knockout phase - round 16
 # Portugal France Brazil Belgium Spain Croatia Switzerland England
@@ -494,8 +510,8 @@ print(knockout_match_data[, c(1,11,21,22)])
 # Quarter-finals
 match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "Portugal", "France")
 match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Belgium")
-match3 <- getMatchFixtureData(rankings_all, copy_combined_results, "Spain", "Croatia")
-match4 <- getMatchFixtureData(rankings_all, copy_combined_results, "England", "Switzerland")
+match3 <- getMatchFixtureData(rankings_all, copy_combined_results, "Croatia", "Spain")
+match4 <- getMatchFixtureData(rankings_all, copy_combined_results, "Switzerland", "England")
 
 qfinal_match_data <- rbind(match1, match2, match3, match4)
 
@@ -504,12 +520,12 @@ qfinal_predict_outcomes <- as.data.frame(predict(randomForestModel_1, qfinal_mat
 qfinal_match_data$pred_outcome <- as.factor(ifelse(qfinal_predict_outcomes[3] > qfinal_predict_outcomes[1], 1, 0))
 
 print("--- Predictions of Quarter Finals winners ---") 
-print(qfinal_match_data[, c(1,11,21,22)])
-# Portugal Brazil Croatia Switzerland
+print(qfinal_match_data[, c(1,15,29,30)])
+# Portugal Belgium Spain Switzerland
 
 # Semi-finals
 match1 <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Portugal")
-match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "Croatia", "Switzerland")
+match2 <- getMatchFixtureData(rankings_all, copy_combined_results, "England", "Spain")
 
 sfinal_match_data <- rbind(match1, match2)
 
@@ -518,16 +534,16 @@ sfinal_predict_outcomes <- as.data.frame(predict(randomForestModel_1, sfinal_mat
 sfinal_match_data$pred_outcome <- as.factor(ifelse(sfinal_predict_outcomes[3] > sfinal_predict_outcomes[1], 1, 0))
 
 print("--- Predictions of Semi Finals winners ---") 
-print(sfinal_match_data[, c(1,11,21,22)])
-# Brazil Switzerland
+print(sfinal_match_data[, c(1,15,29,30)])
+# Brazil Spain
 
 # Finals
-final_match <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Switzerland")
+final_match <- getMatchFixtureData(rankings_all, copy_combined_results, "Brazil", "Spain")
 final_predict_outcome <- predict(randomForestModel_1, final_match, type = "prob")
 final_match$pred_outcome <- as.factor(ifelse(final_predict_outcome[3] > final_predict_outcome[1], 1, 0))
 print("--- Prediction of Final winner ---") 
-print(final_match[, c(1,11,22)])
-# Runner-up Switzerland
+print(final_match[, c(1,15,29,30)])
+# Runner-up Spain
 # Brazil to lift the World Cup 2018
 
 ###

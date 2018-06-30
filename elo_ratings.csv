@@ -1,0 +1,225 @@
+country,year,elo_rating,elo_rank_change,elo_rating_change
+Russia,1994,1837,-5,-29
+Russia,1998,1837,0,0
+Russia,2002,1777,-4,-24
+Russia,2006,1777,0,0
+Russia,2010,1777,0,0
+Russia,2014,1797,-5,-52
+Russia,2018,1692,0,14
+Egypt,1994,1300,0,0
+Egypt,1998,1300,0,0
+Egypt,2002,1300,0,0
+Egypt,2006,1300,0,0
+Egypt,2010,1300,0,0
+Egypt,2014,1300,0,0
+Egypt,2018,1575,-16,-71
+Uruguay,1994,1300,0,0
+Uruguay,1998,1300,0,0
+Uruguay,2002,1804,-2,-8
+Uruguay,2006,1804,0,0
+Uruguay,2010,1883,5,39
+Uruguay,2014,1880,-2,-39
+Uruguay,2018,1954,4,60
+Saudi Arabia,1994,1692,13,52
+Saudi Arabia,1998,1649,-4,-18
+Saudi Arabia,2002,1625,-12,-81
+Saudi Arabia,2006,1559,-6,-25
+Saudi Arabia,2010,1559,0,0
+Saudi Arabia,2014,1559,0,0
+Saudi Arabia,2018,1588,-1,-3
+Morocco,1994,1614,-15,-58
+Morocco,1998,1729,10,62
+Morocco,2002,1729,0,0
+Morocco,2006,1729,0,0
+Morocco,2010,1729,0,0
+Morocco,2014,1729,0,0
+Morocco,2018,1720,-3,-13
+Portugal,1994,1300,0,0
+Portugal,1998,1300,0,0
+Portugal,2002,1921,-4,-59
+Portugal,2006,1937,0,22
+Portugal,2010,1886,3,10
+Portugal,2014,1919,-3,-24
+Portugal,2018,1972,1,2
+Iran,1994,1300,0,0
+Iran,1998,1647,4,22
+Iran,2002,1647,0,0
+Iran,2006,1731,-15,-82
+Iran,2010,1731,0,0
+Iran,2014,1666,-13,-48
+Iran,2018,1816,1,27
+Spain,1994,1927,3,34
+Spain,1998,2040,-3,-42
+Spain,2002,1994,3,31
+Spain,2006,1959,-1,-5
+Spain,2010,2165,0,53
+Spain,2014,1993,-3,-116
+Spain,2018,2028,1,-16
+France,1994,1300,0,0
+France,1998,2003,3,87
+France,2002,1962,-6,-134
+France,2006,2066,1,93
+France,2010,1776,-10,-85
+France,2014,1957,3,60
+France,2018,2007,1,20
+Peru,1994,1300,0,0
+Peru,1998,1300,0,0
+Peru,2002,1300,0,0
+Peru,2006,1300,0,0
+Peru,2010,1300,0,0
+Peru,2014,1300,0,0
+Peru,2018,1890,-5,-25
+Denmark,1994,1300,0,0
+Denmark,1998,1880,-1,2
+Denmark,2002,1903,-3,18
+Denmark,2006,1903,0,0
+Denmark,2010,1730,-12,-49
+Denmark,2014,1730,0,0
+Denmark,2018,1890,1,34
+Australia,1994,1300,0,0
+Australia,1998,1300,0,-14
+Australia,2002,1300,0,0
+Australia,2006,1806,3,4
+Australia,2010,1784,3,7
+Australia,2014,1666,0,0
+Australia,2018,1713,-7,-29
+Argentina,1994,1858,-8,-57
+Argentina,1998,1890,0,41
+Argentina,2002,1980,-2,-35
+Argentina,2006,2005,4,83
+Argentina,2010,1961,2,41
+Argentina,2014,2064,1,45
+Argentina,2018,1918,-6,-68
+Croatia,1994,1300,0,0
+Croatia,1998,1871,10,134
+Croatia,2002,1845,-7,-35
+Croatia,2006,1817,-3,-21
+Croatia,2010,1817,0,0
+Croatia,2014,1795,-2,-24
+Croatia,2018,1956,10,103
+Nigeria,1994,1788,3,46
+Nigeria,1998,1707,4,2
+Nigeria,2002,1753,-7,-16
+Nigeria,2006,1753,0,0
+Nigeria,2010,1680,-7,-36
+Nigeria,2014,1726,-1,2
+Nigeria,2018,1702,0,21
+Iceland,1994,1300,0,0
+Iceland,1998,1300,0,0
+Iceland,2002,1300,0,0
+Iceland,2006,1300,0,0
+Iceland,2010,1300,0,0
+Iceland,2014,1300,0,0
+Iceland,2018,1708,-18,-56
+Costa Rica,1994,1300,0,0
+Costa Rica,1998,1300,0,0
+Costa Rica,2002,1755,-4,-2
+Costa Rica,2006,1641,-11,-83
+Costa Rica,2010,1641,0,0
+Costa Rica,2014,1847,18,135
+Costa Rica,2018,1709,-6,-18
+Brazil,1994,2063,3,100
+Brazil,1998,2095,-1,-48
+Brazil,2002,2071,12,204
+Brazil,2006,2059,-2,25
+Brazil,2010,2095,-1,-15
+Brazil,2014,1980,-6,-158
+Brazil,2018,2142,0,22
+Serbia,1994,1300,0,0
+Serbia,1998,1300,0,0
+Serbia,2002,1300,0,0
+Serbia,2006,1716,-15,-83
+Serbia,2010,1807,0,-35
+Serbia,2014,1807,0,0
+Serbia,2018,1783,-1,-5
+Switzerland,1994,1818,-8,-55
+Switzerland,1998,1818,0,0
+Switzerland,2002,1818,0,0
+Switzerland,2006,1857,13,59
+Switzerland,2010,1783,6,22
+Switzerland,2014,1847,-1,-9
+Switzerland,2018,1913,2,3
+Germany,1994,1985,-2,-24
+Germany,1998,2060,-2,-47
+Germany,2002,1963,6,93
+Germany,2006,1955,2,58
+Germany,2010,2061,1,103
+Germany,2014,2223,2,150
+Germany,2018,1964,-4,-113
+Sweden,1994,1973,6,66
+Sweden,1998,1973,0,0
+Sweden,2002,1857,0,-7
+Sweden,2006,1851,-1,-10
+Sweden,2010,1851,0,0
+Sweden,2014,1851,0,0
+Sweden,2018,1804,3,77
+South Korea,1994,1675,6,10
+South Korea,1998,1767,-8,-51
+South Korea,2002,1780,6,46
+South Korea,2006,1723,-1,-8
+South Korea,2010,1746,-7,-20
+South Korea,2014,1617,-8,-51
+South Korea,2018,1677,14,43
+Mexico,1994,1867,5,14
+Mexico,1998,1846,1,24
+Mexico,2002,1833,1,1
+Mexico,2006,1818,-2,-20
+Mexico,2010,1869,-3,-41
+Mexico,2014,1883,10,69
+Mexico,2018,1843,-1,-7
+Belgium,1994,1821,1,-2
+Belgium,1998,1820,0,5
+Belgium,2002,1824,-5,-14
+Belgium,2006,1824,0,0
+Belgium,2010,1824,0,0
+Belgium,2014,1912,5,59
+Belgium,2018,2001,1,1
+Tunisia,1994,1300,0,0
+Tunisia,1998,1638,0,-9
+Tunisia,2002,1609,-1,-17
+Tunisia,2006,1663,-4,-45
+Tunisia,2010,1663,0,0
+Tunisia,2014,1663,0,0
+Tunisia,2018,1633,2,5
+England,1994,1300,0,0
+England,1998,1973,-3,-4
+England,2002,1965,2,41
+England,2006,2000,-2,27
+England,2010,1915,-2,-86
+England,2014,1860,-6,-72
+England,2018,1974,2,10
+Panama,1994,1300,0,0
+Panama,1998,1300,0,0
+Panama,2002,1300,0,0
+Panama,2006,1300,0,0
+Panama,2010,1300,0,0
+Panama,2014,1300,0,0
+Panama,2018,1625,-13,-63
+Colombia,1994,1896,-6,-46
+Colombia,1998,1762,-1,-23
+Colombia,2002,1762,0,0
+Colombia,2006,1762,0,0
+Colombia,2010,1762,0,0
+Colombia,2014,2019,4,97
+Colombia,2018,1920,-1,11
+Poland,1994,1300,0,0
+Poland,1998,1300,0,0
+Poland,2002,1744,1,11
+Poland,2006,1773,-8,-49
+Poland,2010,1773,0,0
+Poland,2014,1773,0,0
+Poland,2018,1754,-2,-48
+Japan,1994,1300,0,0
+Japan,1998,1737,-16,-72
+Japan,2002,1829,-4,-24
+Japan,2006,1738,-6,-51
+Japan,2010,1763,17,82
+Japan,2014,1735,-6,-51
+Japan,2018,1708,1,24
+Senegal,1994,1300,0,0
+Senegal,1998,1300,0,0
+Senegal,2002,1783,14,81
+Senegal,2006,1783,0,0
+Senegal,2010,1783,0,0
+Senegal,2014,1783,0,0
+Senegal,2018,1782,2,13
